@@ -10,8 +10,20 @@ public class PlayerMovement : MonoBehaviour {
     private bool moveLeft = false;
     private bool moveRight = false;
 
+    public float startDelayTime = 0.5f;
+
+    private bool shouldMove = false;
+
+    private void Start()
+    {
+        Invoke("SetMoveInvoke", startDelayTime);
+    }
+
     // Fixed Update for physics
-	void FixedUpdate () {
+    private void FixedUpdate () {
+        if (!shouldMove)
+            return;
+   
         // even out frames per second on a better pc with deltaTime
         rb.AddForce(0, 0, forwardForce * Time.deltaTime);
 
@@ -26,15 +38,35 @@ public class PlayerMovement : MonoBehaviour {
             rb.AddForce(-sidewaysForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
             moveLeft = false;
         }    
+
+        // check position below ground
+        if (rb.position.y < -0.5f)
+        {
+            FindObjectOfType<GameManager>().EndGame();
+        }
     }
 
-    void Update()
+    private void Update()
     {
+        if (!shouldMove)
+            return;
+
         // check for input
         if (Input.GetKey("d") || Input.GetKey(KeyCode.RightArrow))
             moveRight = true;
 
         if (Input.GetKey("a") || Input.GetKey(KeyCode.LeftArrow))
             moveLeft = true;
+    }
+
+    // workaround for invoke
+    public void SetMoveInvoke()
+    {
+        SetShouldMove(true);
+    }
+
+    public void SetShouldMove(bool setTo)
+    {
+        shouldMove = setTo;
     }
 }

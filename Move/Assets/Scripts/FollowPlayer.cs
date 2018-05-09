@@ -8,6 +8,7 @@ public class FollowPlayer : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        transform.position = player.position + offset;
+        if (player != null && !float.IsNaN(player.position.x))
+            transform.position = player.position + offset;
 	}
 }
